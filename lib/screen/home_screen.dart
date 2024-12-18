@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phonebook_app/widgets/list_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,8 +14,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Flutter Phone Book"),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.grey,
+        actions: [
+          IconButton(onPressed: (){}, icon: Icon(Icons.search)),
+          IconButton(onPressed: (){}, icon: Icon(Icons.add))
+        ],
       ),
+      body: ContactListWidget(),
     );
   }
 }
