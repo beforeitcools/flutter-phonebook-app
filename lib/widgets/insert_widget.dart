@@ -2,7 +2,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:phonebook_app/models/contact_model.dart';
@@ -32,23 +31,6 @@ class _PhoneBookInsertWidgetState extends State<PhoneBookInsertWidget> {
         _profileImgController.text = image.path;
       });
     }
-  }
-
-  // 이미지 갤러리에 저장 함수
-  Future<void> saveImageToGallery(String imagePath) async {
-    final Directory directory = await getApplicationDocumentsDirectory();
-    final String fileName = DateTime
-        .now()
-        .millisecondsSinceEpoch
-        .toString() + '.png';
-    final File file = File('$directory/$fileName');
-
-  // 이미지 파일을 로컬에 저장
-    await file.writeAsBytes(await File(imagePath).readAsBytes());
-
-  // 갤러리에 저장
-    final result = await ImageGallerySaver.saveFile(file.path);
-    print("Image saved to gallery: $result");
   }
 
   void _registContact() async{
