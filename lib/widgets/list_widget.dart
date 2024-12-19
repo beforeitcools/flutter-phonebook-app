@@ -44,6 +44,7 @@ class _ContactListWidgetState extends State<ContactListWidget> {
                           title: Text(contact["name"]),
                           onTap: () {},
                           trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
                                   onPressed: () {
