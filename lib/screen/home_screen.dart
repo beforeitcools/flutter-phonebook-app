@@ -16,8 +16,8 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text("Flutter Phone Book"),
         backgroundColor: Colors.grey,
         actions: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.search)),
-          IconButton(onPressed: (){}, icon: Icon(Icons.add))
+          IconButton(onPressed: (){/* 검색? */}, icon: Icon(Icons.search)),
+          IconButton(onPressed: (){/* 연락처 추가 로직 */}, icon: Icon(Icons.add))
         ],
       ),
       body: ContactListWidget(),
