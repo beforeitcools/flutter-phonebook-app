@@ -11,7 +11,7 @@ class ContactListWidget extends StatefulWidget {
 class _ContactListWidgetState extends State<ContactListWidget> {
 
   final ContactModel _contactModel = ContactModel();
-  List<dynamic> _contacts = [];
+  List<dynamic> _contacts = [ ];
   dynamic _selectedContact;
 
   @override
@@ -79,4 +79,3 @@ class ContactDetailPage extends StatelessWidget {
     );
   }
 }
-
