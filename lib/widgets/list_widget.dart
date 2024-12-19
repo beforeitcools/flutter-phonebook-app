@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phonebook_app/models/contact_model.dart';
+import 'package:phonebook_app/widgets/update_widget.dart';
 
 class ContactListWidget extends StatefulWidget {
   const ContactListWidget({super.key});
@@ -9,18 +10,17 @@ class ContactListWidget extends StatefulWidget {
 }
 
 class _ContactListWidgetState extends State<ContactListWidget> {
-
   final ContactModel _contactModel = ContactModel();
-  List<dynamic> _contacts = [ ];
+  List<dynamic> _contacts = [];
   dynamic _selectedContact;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _loadContacts();
   }
 
-  void _loadContacts() async{
+  void _loadContacts() async {
     List<dynamic> contactData = await _contactModel.selectContact();
     setState(() {
       _contacts = contactData;
@@ -43,7 +43,14 @@ class _ContactListWidgetState extends State<ContactListWidget> {
                   onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=> ContactDetailPage(name: contact["name"], phone: contact["phone"], profileImg: contact["profileImg"]??"")));},
                   trailing: Wrap(
                       children: <Widget>[
-                        IconButton(onPressed: (){/* 수정 로직 */}, icon: Icon(Icons.edit)),
+                        IconButton(onPressed: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                            builder: (context) => UpdateWidget(
+                            contact: contact,
+                            )));},
+                            icon: Icon(Icons.edit)),
                         IconButton(onPressed: (){/* 삭제 로직 */}, icon: Icon(Icons.delete)),
                       ]
                     )
