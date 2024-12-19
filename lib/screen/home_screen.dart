@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phonebook_app/widgets/list_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,17 +14,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Flutter Phone Book"),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.grey,
+        actions: [
+          IconButton(onPressed: (){}, icon: Icon(Icons.search)),
+          IconButton(onPressed: (){}, icon: Icon(Icons.add))
+        ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          items: const[
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "홈"),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: "번호검색"),
-            BottomNavigationBarItem(icon: Icon(Icons.add), label: "번호등록"),
-            BottomNavigationBarItem(icon: Icon(Icons.edit), label: "번호수정"),
-            BottomNavigationBarItem(icon: Icon(Icons.delete), label: "번호삭제"),
-          ]),
+      body: ContactListWidget(),
     );
   }
 }
