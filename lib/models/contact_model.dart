@@ -24,7 +24,7 @@ class ContactModel{
     final dio = Dio();
 
     try{
-      final response = await dio.post("http://localhost:8080/phonbook/insert",
+      final response = await dio.post("http://localhost:8080/phonebook/insert",
           data: phoneBookData
       );
       if (response.statusCode == 200){
