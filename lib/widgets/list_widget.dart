@@ -11,7 +11,7 @@ class ContactListWidget extends StatefulWidget {
 class _ContactListWidgetState extends State<ContactListWidget> {
 
   final ContactModel _contactModel = ContactModel();
-  List<dynamic> _contacts = [ ];
+  List<dynamic> _contacts = [];
   dynamic _selectedContact;
 
   @override
@@ -40,18 +40,43 @@ class _ContactListWidgetState extends State<ContactListWidget> {
                 final contact = _contacts[i];
                 return ListTile(
                   title: Text(contact["name"]),
-                  onTap: (){},
-                  trailing: Row(
-                    children: [
-                      IconButton(onPressed: (){}, icon: Icon(Icons.edit)),
-                      IconButton(onPressed: (){}, icon: Icon(Icons.delete)),
-                    ],
-                  ),
-                );
+                  onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=> ContactDetailPage(name: contact["name"], phone: contact["phone"], profileImg: contact["profileImg"]??"")));},
+                  trailing: Wrap(
+                      children: <Widget>[
+                        IconButton(onPressed: (){/* 수정 로직 */}, icon: Icon(Icons.edit)),
+                        IconButton(onPressed: (){/* 삭제 로직 */}, icon: Icon(Icons.delete)),
+                      ]
+                    )
+                  );
               }))
         ],
       ),
-      
     );
   }
 }
+
+class ContactDetailPage extends StatelessWidget {
+  final String name;
+  final String phone;
+  final String profileImg;
+
+  const ContactDetailPage({super.key, required this.name, required this.phone, required this.profileImg});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(name),
+      ),
+      body: Padding(padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("이름: $name"),
+            Text("번호: $phone")
+          ],
+        ),),
+    );
+  }
+}
+

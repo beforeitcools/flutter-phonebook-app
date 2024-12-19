@@ -6,7 +6,7 @@ class ContactModel{
   Future<List<dynamic>> selectContact() async{
     final dio = Dio();
     try{
-      final response = await dio.get("*");
+      final response = await dio.get("http://localhost:8080/phonebook/select");
 
       if(response.statusCode == 200){
         return response.data as List<dynamic>;
