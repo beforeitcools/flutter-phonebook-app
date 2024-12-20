@@ -4,7 +4,12 @@ import 'package:phonebook_app/models/contact_model.dart';
 import 'package:phonebook_app/widgets/update_widget.dart';
 
 class ContactListWidget extends StatefulWidget {
-  const ContactListWidget({super.key});
+  bool searchTrigger;
+
+  ContactListWidget({
+    super.key,
+    required this.searchTrigger,
+  });
 
   @override
   State<ContactListWidget> createState() => _ContactListWidgetState();
@@ -14,11 +19,13 @@ class _ContactListWidgetState extends State<ContactListWidget> {
   final ContactModel _contactModel = ContactModel();
   List<dynamic> _contacts = [];
   dynamic _selectedContact;
+  late bool searchTrigger;
 
   @override
   void initState() {
     super.initState();
     _loadContacts();
+    searchTrigger = widget.searchTrigger;
   }
 
   void _loadContacts() async {
@@ -26,6 +33,43 @@ class _ContactListWidgetState extends State<ContactListWidget> {
     setState(() {
       _contacts = contactData;
     });
+  }
+
+  void _deleteContact(Map<String, dynamic> contact) async {
+    try {
+      String result = await _contactModel.deleteContact(contact);
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(result)));
+      Navigator.pushReplacementNamed(context, "/home");
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error : $e')));
+    }
+  }
+
+  void _deleteDialog(Map<String, dynamic> contact) async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("연락처 삭제"),
+            content: Text("${contact['name']} 님의 연락처를 정말 삭제 하시겠습니까?"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("취소")),
+              TextButton(
+                  onPressed: () {
+                    _deleteContact(contact);
+                    Navigator.pop(context);
+                  },
+                  child: Text("삭제")),
+            ],
+          );
+        });
   }
 
   @override
@@ -37,7 +81,12 @@ class _ContactListWidgetState extends State<ContactListWidget> {
           Expanded(
               child: _contacts.isEmpty
                   ? Center(child: Text("내 연락처 불러오는 중!"))
-                  : ListView.builder(
+                  :
+                  /*searchTrigger == true
+                  ? TextField(
+
+                  )*/
+                  ListView.builder(
                       itemCount: _contacts.length,
                       itemBuilder: (context, i) {
                         final contact = _contacts[i];
@@ -65,7 +114,9 @@ class _ContactListWidgetState extends State<ContactListWidget> {
                                   },
                                   icon: Icon(Icons.edit)),
                               IconButton(
-                                  onPressed: () {/* 삭제 로직 */},
+                                  onPressed: () {
+                                    _deleteDialog(contact);
+                                  },
                                   icon: Icon(Icons.delete)),
                             ]));
                       }))
@@ -92,25 +143,38 @@ class ContactDetailPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(name),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
+      body: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircleAvatar(
               radius: 50,
-              backgroundImage: CachedNetworkImageProvider(profileImg),
-              child: CachedNetworkImage(
-                imageUrl: profileImg,
-                placeholder: (context, url) => CircularProgressIndicator(),
-                errorWidget: (context, url, error) => Icon(
-                  Icons.person,
-                  size: 80,
-                ),
-                // Image.asset("assets/anonymous_person.png"),
-              ),
+              child: profileImg.isNotEmpty || profileImg != null
+                  ? ClipOval(
+                      child: CachedNetworkImage(
+                      imageUrl: profileImg,
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(
+                        Icons.person,
+                        size: 80,
+                      ),
+                      fit: BoxFit.cover,
+                      width: 100,
+                      height: 100,
+                    ))
+                  : Icon(
+                      Icons.person,
+                      size: 80,
+                    ),
+            ),
+            SizedBox(
+              height: 16,
             ),
             Text("이름: $name"),
+            SizedBox(
+              height: 16,
+            ),
             Text("번호: $phone")
           ],
         ),

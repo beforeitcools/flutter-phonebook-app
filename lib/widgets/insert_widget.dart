@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:phonebook_app/models/contact_model.dart';
 
 class PhoneBookInsertWidget extends StatefulWidget {
@@ -15,35 +15,67 @@ class PhoneBookInsertWidget extends StatefulWidget {
 class _PhoneBookInsertWidgetState extends State<PhoneBookInsertWidget> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
-  TextEditingController _profileImgController = TextEditingController();
-
   final ContactModel _contactModel = ContactModel();
-  String? _profileImagePath;
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
 
-  // 이미지 선택 함수
-  Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
+  Future<void> _pickImageFromGallery() async {
+    XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
       setState(() {
-        _profileImagePath = image.path;
-        _profileImgController.text = image.path;
+        _image = File(pickedFile.path);
       });
     }
   }
 
-  void _registContact() async {
-    Map<String, dynamic> phoneBookData = {
+  Future<void> _pickImageFromCamera() async {
+    XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  void _showImagePickDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("사진 선택"),
+            actions: [
+              TextButton(
+                  onPressed: () async {
+                    await _pickImageFromGallery();
+                    Navigator.pop(context);
+                  },
+                  child: Text("갤러리에서 선택")),
+              TextButton(
+                  onPressed: () {
+                    _pickImageFromCamera();
+                    Navigator.pop(context);
+                  },
+                  child: Text("사진 촬영")),
+            ],
+          );
+        });
+  }
+
+  void _registerContact() async {
+    Map<String, dynamic> contactData = {
       'name': _nameController.text,
-      'phone': _phoneController.text,
-      'image': _profileImgController.text, // 이미지 경로 전송
+      'phoneNumber': _phoneController.text,
     };
 
     try {
-      String result = await _contactModel.insertMenu(phoneBookData);
+      String result = await _contactModel.insertContact(contactData, _image);
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result)),
       );
+      Navigator.pop(context);
       Navigator.pushReplacementNamed(context, "/home");
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -54,35 +86,66 @@ class _PhoneBookInsertWidgetState extends State<PhoneBookInsertWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        children: [
-          TextField(
-            controller: _nameController,
-            decoration: InputDecoration(labelText: "이름"),
-          ),
-          SizedBox(height: 10),
-          TextField(
-            controller: _phoneController,
-            decoration: InputDecoration(labelText: "번호"),
-          ),
-          SizedBox(height: 10),
-          TextField(
-            controller: _profileImgController,
-            decoration: InputDecoration(labelText: "이미지"),
-          ),
-          SizedBox(height: 10),
-          // 이미지 미리보기
-          _profileImagePath != null
-              ? Image.file(File(_profileImagePath!)) // 선택된 이미지 표시
-              : Container(),
-          ElevatedButton(
-            onPressed: _pickImage, // 이미지 선택 버튼
-            child: Text("프로필 이미지 선택하기"),
-          ),
-          ElevatedButton(onPressed: _registContact, child: Text("연락처 등록하기"))
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("연락처 등록"),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 50,
+              child: _image != null
+                  ? ClipOval(
+                      child: Image.file(
+                      _image!,
+                      fit: BoxFit.cover,
+                      width: 100,
+                      height: 100,
+                    ))
+                  : Icon(
+                      Icons.person,
+                      size: 80,
+                    ),
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  _showImagePickDialog();
+                },
+                child: Text("프로필 사진 수정")),
+            SizedBox(
+              height: 16,
+            ),
+            SizedBox(
+              height: 50,
+              width: 200,
+              child: TextField(
+                controller: _nameController,
+                decoration: InputDecoration(labelText: "이름"),
+              ),
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            SizedBox(
+              height: 50,
+              width: 200,
+              child: TextField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(labelText: "전화번호"),
+              ),
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            ElevatedButton(onPressed: _registerContact, child: Text("연락처 등록"))
+          ],
+        ),
       ),
     );
   }

@@ -75,8 +75,8 @@ class _UpdateWidgetState extends State<UpdateWidget> {
     super.initState();
     contact = widget.contact;
 
-    if (contact['profile_img'] == null) {
-      contact['profile_img'] = "null";
+    if (contact['profileImg'] == null) {
+      contact['profileImg'] = "null";
     }
 
     _nameController.text = contact['name'];
@@ -95,6 +95,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
 
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(result)));
+      Navigator.pop(context);
       Navigator.pushReplacementNamed(context, "/home");
     } catch (e) {
       ScaffoldMessenger.of(context)
@@ -105,30 +106,33 @@ class _UpdateWidgetState extends State<UpdateWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("연락처 수정"),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _image == null
-                ? CircleAvatar(
-                    radius: 50,
-                    backgroundImage:
-                        CachedNetworkImageProvider(contact['profile_img']),
-                    child: CachedNetworkImage(
-                      imageUrl: contact['profile_img'],
-                      placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(
-                        Icons.person,
-                        size: 80,
-                      ),
-                    ),
-                  )
-                : CircleAvatar(
-                    radius: 50,
-                    backgroundImage: FileImage(_image!),
-                  ),
+            CircleAvatar(
+                radius: 50,
+                child: _image == null
+                    ? ClipOval(
+                        child: CachedNetworkImage(
+                        imageUrl: contact['profileImg'],
+                        placeholder: (context, url) =>
+                            CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => Icon(
+                          Icons.person,
+                          size: 80,
+                        ),
+                        fit: BoxFit.cover,
+                        width: 100,
+                        height: 100,
+                      ))
+                    : CircleAvatar(
+                        radius: 50,
+                        backgroundImage: FileImage(_image!),
+                      )),
             SizedBox(
               height: 16,
             ),
@@ -156,6 +160,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
               width: 200,
               child: TextField(
                 controller: _phoneController,
+                keyboardType: TextInputType.phone,
                 decoration: InputDecoration(labelText: "전화번호"),
               ),
             ),
