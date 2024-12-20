@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:phonebook_app/models/contact_model.dart';
 import 'package:phonebook_app/widgets/update_widget.dart';
@@ -33,29 +34,41 @@ class _ContactListWidgetState extends State<ContactListWidget> {
       padding: EdgeInsets.all(16),
       child: Column(
         children: [
-          Expanded(child: _contacts.isEmpty ? Center(child: Text("내 연락처 불러오는 중!"))
-          : ListView.builder(
-              itemCount: _contacts.length,
-              itemBuilder: (context, i){
-                final contact = _contacts[i];
-                return ListTile(
-                  title: Text(contact["name"]),
-                  onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=> ContactDetailPage(name: contact["name"], phone: contact["phone"], profileImg: contact["profileImg"]??"")));},
-                  trailing: Wrap(
-                      children: <Widget>[
-                        IconButton(onPressed: (){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                            builder: (context) => UpdateWidget(
-                            contact: contact,
-                            )));},
-                            icon: Icon(Icons.edit)),
-                        IconButton(onPressed: (){/* 삭제 로직 */}, icon: Icon(Icons.delete)),
-                      ]
-                    )
-                  );
-              }))
+          Expanded(
+              child: _contacts.isEmpty
+                  ? Center(child: Text("내 연락처 불러오는 중!"))
+                  : ListView.builder(
+                      itemCount: _contacts.length,
+                      itemBuilder: (context, i) {
+                        final contact = _contacts[i];
+                        return ListTile(
+                            title: Text(contact["name"]),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ContactDetailPage(
+                                          name: contact["name"],
+                                          phone: contact["phone"],
+                                          profileImg:
+                                              contact["profileImg"] ?? "")));
+                            },
+                            trailing: Wrap(children: <Widget>[
+                              IconButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => UpdateWidget(
+                                                  contact: contact,
+                                                )));
+                                  },
+                                  icon: Icon(Icons.edit)),
+                              IconButton(
+                                  onPressed: () {/* 삭제 로직 */},
+                                  icon: Icon(Icons.delete)),
+                            ]));
+                      }))
         ],
       ),
     );
@@ -67,7 +80,11 @@ class ContactDetailPage extends StatelessWidget {
   final String phone;
   final String profileImg;
 
-  const ContactDetailPage({super.key, required this.name, required this.phone, required this.profileImg});
+  const ContactDetailPage(
+      {super.key,
+      required this.name,
+      required this.phone,
+      required this.profileImg});
 
   @override
   Widget build(BuildContext context) {
@@ -75,14 +92,29 @@ class ContactDetailPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(name),
       ),
-      body: Padding(padding: EdgeInsets.all(16),
+      body: Padding(
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: CachedNetworkImageProvider(profileImg),
+              child: CachedNetworkImage(
+                imageUrl: profileImg,
+                placeholder: (context, url) => CircularProgressIndicator(),
+                errorWidget: (context, url, error) => Icon(
+                  Icons.person,
+                  size: 80,
+                ),
+                // Image.asset("assets/anonymous_person.png"),
+              ),
+            ),
             Text("이름: $name"),
             Text("번호: $phone")
           ],
-        ),),
+        ),
+      ),
     );
   }
 }

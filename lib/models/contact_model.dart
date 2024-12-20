@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -8,7 +9,8 @@ class ContactModel {
     final dio = Dio();
 
     try {
-      final response = await dio.get("http://localhost:8080/phonebook/select");
+      final response =
+          await dio.get("http://112.221.66.174:1102/phonebook/select");
 
       if (response.statusCode == 200) {
         return response.data as List<dynamic>;
@@ -23,19 +25,21 @@ class ContactModel {
 
   // 수정
   Future<String> updateContact(
-      Map<String, String> contactData, File? image) async {
+      Map<String, dynamic> contactData, File? image) async {
     final dio = Dio();
     try {
       FormData formData = FormData.fromMap({
-        'contactData': contactData,
+        'contactData': jsonEncode(contactData),
         'image': image == null
             ? null
             : await MultipartFile.fromFile(
                 image.path,
+                filename: image.path.split('/').last,
               ),
       });
 
-      final response = await dio.post("http://localhost:8080/phonebook/update",
+      final response = await dio.post(
+          "http://112.221.66.174:1102/phonebook/update",
           data: formData,
           options: Options(headers: {'Content-Type': 'multipart/form-data'}));
 

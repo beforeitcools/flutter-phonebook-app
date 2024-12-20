@@ -54,13 +54,15 @@ class _UpdateWidgetState extends State<UpdateWidget> {
             title: Text("사진 선택"),
             actions: [
               TextButton(
-                  onPressed: () {
-                    _pickImageFromGallery();
+                  onPressed: () async {
+                    await _pickImageFromGallery();
+                    Navigator.pop(context);
                   },
                   child: Text("갤러리에서 선택")),
               TextButton(
                   onPressed: () {
                     _pickImageFromCamera();
+                    Navigator.pop(context);
                   },
                   child: Text("사진 촬영")),
             ],
@@ -82,10 +84,10 @@ class _UpdateWidgetState extends State<UpdateWidget> {
   }
 
   void _updateContact() async {
-    Map<String, String> contactData = {
+    Map<String, dynamic> contactData = {
       'id': contact['id'],
       'name': _nameController.text,
-      'phone': _phoneController.text
+      'phoneNumber': _phoneController.text
     };
 
     try {
@@ -108,22 +110,25 @@ class _UpdateWidgetState extends State<UpdateWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: _image == null
-                  ? CachedNetworkImageProvider(contact['profile_img'])
-                  : CachedNetworkImageProvider(_image!.path),
-              child: CachedNetworkImage(
-                imageUrl:
-                    _image == null ? contact['profile_img'] : _image!.path,
-                placeholder: (context, url) => CircularProgressIndicator(),
-                errorWidget: (context, url, error) => Icon(
-                  Icons.person,
-                  size: 80,
-                ),
-                // Image.asset("assets/anonymous_person.png"),
-              ),
-            ),
+            _image == null
+                ? CircleAvatar(
+                    radius: 50,
+                    backgroundImage:
+                        CachedNetworkImageProvider(contact['profile_img']),
+                    child: CachedNetworkImage(
+                      imageUrl: contact['profile_img'],
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(
+                        Icons.person,
+                        size: 80,
+                      ),
+                    ),
+                  )
+                : CircleAvatar(
+                    radius: 50,
+                    backgroundImage: FileImage(_image!),
+                  ),
             SizedBox(
               height: 16,
             ),
